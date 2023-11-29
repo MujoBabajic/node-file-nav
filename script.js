@@ -94,7 +94,7 @@ function deleteFileOrDirectory(name) {
       return;
     }
     if (stats.isDirectory()) {
-      fs.rmdir(name, { recursive: true }, (err) => {
+      fs.rm(name, { recursive: true }, (err) => {
         if (err) {
           console.error("Error deleting directory:", err);
           return;
