@@ -1,13 +1,28 @@
 const fs = require("fs");
 const readline = require("readline");
-const path = require("path");
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-function displayCommands() {
+console.log("NODE FILE NAV\nBILD IT, Mujo Babajic, 2023");
+displayAvailableCommands();
+
+rl.setPrompt("> ");
+rl.prompt();
+
+rl.on("line", (input) => {
+  runCommand(input);
+  rl.prompt();
+});
+
+rl.on("close", () => {
+  console.log("Exited program");
+  process.exit(0);
+});
+
+function displayAvailableCommands() {
   console.log(`Available commands:
   ls - List files in current directory
   mkdir <directory_name> - Create a new directory
@@ -21,9 +36,9 @@ function displayCommands() {
 }
 
 function listFiles() {
-  fs.readdir("./", (err, files) => {
-    if (err) {
-      console.error("Error reading directory:", err);
+  fs.readdir("./", (error, files) => {
+    if (error) {
+      console.error("Error reading directory:", error);
       return;
     }
     console.log("Files in current directory:");
@@ -34,9 +49,9 @@ function listFiles() {
 }
 
 function createDirectory(directoryName) {
-  fs.mkdir(directoryName, (err) => {
-    if (err) {
-      console.error("Error creating directory:", err);
+  fs.mkdir(directoryName, (error) => {
+    if (error) {
+      console.error("Error creating directory:", error);
       return;
     }
     console.log(`Directory '${directoryName}' created successfully.`);
@@ -55,9 +70,9 @@ function changeDirectory(directoryName) {
 }
 
 function createFile(fileName) {
-  fs.writeFile(fileName, "", (err) => {
-    if (err) {
-      console.error("Error creating file:", err);
+  fs.writeFile(fileName, "", (error) => {
+    if (error) {
+      console.error("Error creating file:", error);
       return;
     }
     console.log(`File '${fileName}' created successfully.`);
@@ -65,24 +80,23 @@ function createFile(fileName) {
 }
 
 function readFile(fileName) {
-  fs.readFile(fileName, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error reading file:", err);
+  fs.readFile(fileName, "utf8", (error, data) => {
+    if (error) {
+      console.error("Error reading file:", error);
       return;
     }
-    console.log(`Contents of '${fileName}':`);
-    console.log(data);
+    console.log(`Contents of '${fileName}':\n${data}`);
   });
 }
 
-function copyFile(sourceFile, destinationFile) {
-  fs.copyFile(sourceFile, destinationFile, (err) => {
-    if (err) {
-      console.error("Error copying file:", err);
+function copyFile(originalFile, destinationFile) {
+  fs.copyFile(originalFile, destinationFile, (error) => {
+    if (error) {
+      console.error("Error copying file:", error);
       return;
     }
     console.log(
-      `File '${sourceFile}' copied to '${destinationFile}' successfully.`
+      `File '${originalFile}' copied to '${destinationFile}' successfully.`
     );
   });
 }
@@ -113,7 +127,7 @@ function deleteFileOrDirectory(name) {
   });
 }
 
-function executeCommand(input) {
+function runCommand(input) {
   const [command, ...args] = input.trim().split(" ");
 
   switch (command) {
@@ -139,30 +153,12 @@ function executeCommand(input) {
       deleteFileOrDirectory(args[0]);
       break;
     case "help":
-      displayCommands();
+      displayAvailableCommands();
       break;
     case "exit":
       rl.close();
       break;
     default:
-      console.log(
-        'Command not recognized. Type "help" to see available commands.'
-      );
+      console.log('Unknown command. Type "help" to see available commands.');
   }
 }
-
-console.log("Welcome to the Node.js File Manager!");
-displayCommands();
-
-rl.setPrompt("> ");
-rl.prompt();
-
-rl.on("line", (input) => {
-  executeCommand(input);
-  rl.prompt();
-});
-
-rl.on("close", () => {
-  console.log("Exiting the File Manager. Goodbye!");
-  process.exit(0);
-});
